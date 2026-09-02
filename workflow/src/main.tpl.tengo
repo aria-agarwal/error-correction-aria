@@ -1,61 +1,38 @@
 wf := import("@platforma-sdk/workflow-tengo:workflow")
-exec := import("@platforma-sdk/workflow-tengo:exec")
-assets:= import("@platforma-sdk/workflow-tengo:assets")
-pframes := import("@platforma-sdk/workflow-tengo:pframes")
-maps := import("@platforma-sdk/workflow-tengo:maps")
-errorCorrectionSw := assets.importSoftware("@platforma-aria/platforma-aria.custom-error-correction.software:error-correction")
+assets := import("@platforma-sdk/workflow-tengo:assets")
+render := import("@platforma-sdk/workflow-tengo:render")
+
+processTpl := assets.importTemplate(":process")
 
 wf.body(func(args) {
 	if is_undefined(args.inputRef) || is_undefined(args.seqCol) || is_undefined(args.countCol) {
 		return { outputs: {}, exports: {} }
 	}
-	
-	inputDataset := wf.resolve(args.inputRef)
-	allCols := inputDataset.getColumns()
-	primaryCol := undefined
-	for _, col in allCols {
-		if col.spec.annotations["pl7.app/abundance/isPrimary"] == "true" {
-			primaryCol = col
-			break
+
+	anchor := "main"
+	bundleBuilder := wf.createPBundleBuilder()
+	bundleBuilder.addAnchor(anchor, args.inputRef)
+	bundleBuilder.addMulti({
+		axes: [{ anchor: anchor, idx: 0 }, { anchor: anchor, idx: 1 }],
+		annotations: {
+			"pl7.app/isAbundance": "true",
+			"pl7.app/abundance/normalized": "false"
 		}
-	}
-	sampleIdAxisSpec := primaryCol.spec.axesSpec[0]
-	clonotypeKeyAxisSpec := primaryCol.spec.axesSpec[1]
+	}, "abundanceCols")
+	bundleBuilder.addMulti({ axes: [{ anchor: anchor, idx: 1 }] }, "propertyCols")
 
-	tsvBuilder := pframes.tsvFileBuilder()
-	tsvBuilder.setAxisHeader(sampleIdAxisSpec, "sampleId")
-	tsvBuilder.setAxisHeader(clonotypeKeyAxisSpec, "clonotypeKey")
-
-	for i, col in allCols {
-		tsvBuilder.add(col, { header: "col_" + string(i) })
-	}
-
-	inputTsv := tsvBuilder.build()
-
-	result := exec.builder().
-		software(errorCorrectionSw).
-		arg("--input_tsv").arg("input.tsv").
-		arg("--output_tsv").arg("output.tsv").
-		arg("--seq_col").arg(args.seqCol).
-		arg("--count_col").arg(args.countCol).
-		arg("--max_hd").arg(string(args.maxHd)).
-		arg("--min_ratio").arg(string(args.minRatio)).
-		arg("--lower_cutoff").arg(string(args.lowerCutoff)).
-		addFile("input.tsv", inputTsv).
-		saveFile("output.tsv").
-		printErrStreamToStdout().
-		cache(24 * 60 * 60 * 1000).
-		run()
-
-	outputTsv := result.getFile("output.tsv")
+	result := render.createEphemeral(processTpl, {
+		columns: bundleBuilder.build(),
+		seqCol: args.seqCol,
+		countCol: args.countCol,
+		maxHd: args.maxHd,
+		minRatio: args.minRatio,
+		lowerCutoff: args.lowerCutoff
+	})
 
 	return {
-		outputs: {
-			pythonMessage: pythonMessage,
-			tengoMessage: tengoMessage
-		},
-
-		exports: {filteredTsv: outputTsv}
+		outputs: { pf: result.output("pf") },
+		exports: { pf: result.output("pf") }
 	}
 })
 

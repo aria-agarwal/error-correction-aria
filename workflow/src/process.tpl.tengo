@@ -1,0 +1,89 @@
+self := import("@platforma-sdk/workflow-tengo:tpl")
+ll := import("@platforma-sdk/workflow-tengo:ll")
+exec := import("@platforma-sdk/workflow-tengo:exec")
+assets := import("@platforma-sdk/workflow-tengo:assets")
+pframes := import("@platforma-sdk/workflow-tengo:pframes")
+pSpec := import("@platforma-sdk/workflow-tengo:pframes.spec")
+xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
+maps := import("@platforma-sdk/workflow-tengo:maps")
+
+errorCorrectionSw := assets.importSoftware("@platforma-open/platforma-aria.test.software:error-correction")
+
+self.awaitState("columns", "PColumnBundle")
+self.defineOutputs("pf")
+
+self.body(func(inputs) {
+	abundanceCols := inputs.columns.getColumns("abundanceCols")
+	propertyCols := inputs.columns.getColumns("propertyCols")
+	ll.assert(len(abundanceCols) > 0, "No abundance columns found in selected dataset")
+
+	primaryCol := abundanceCols[0]
+	for _, col in abundanceCols {
+		if col.spec.annotations["pl7.app/abundance/isPrimary"] == "true" {
+			primaryCol = col
+			break
+		}
+	}
+	sampleIdAxisSpec := primaryCol.spec.axesSpec[0]
+	clonotypeKeyAxisSpec := primaryCol.spec.axesSpec[1]
+
+	matchedCountCol := undefined
+	for _, col in abundanceCols {
+		label := col.spec.annotations["pl7.app/label"]
+		if label == inputs.countCol || col.spec.name == inputs.countCol || (inputs.countCol == "readCount" && label == "Number Of Reads") {
+			matchedCountCol = col
+			break
+		}
+	}
+	ll.assert(matchedCountCol != undefined, "Cannot resolve count column '" + inputs.countCol + "'")
+
+	matchedSeqCol := undefined
+	for _, col in propertyCols {
+		label := col.spec.annotations["pl7.app/label"]
+		if label == inputs.seqCol || col.spec.name == inputs.seqCol || (inputs.seqCol == "aaSeqCDR3" && label == "CDR3 aa") {
+			matchedSeqCol = col
+			break
+		}
+	}
+	ll.assert(matchedSeqCol != undefined, "Cannot resolve sequence column '" + inputs.seqCol + "'")
+
+	slimBuilder := pframes.tsvFileBuilder()
+	slimBuilder.setAxisHeader(sampleIdAxisSpec, "sampleId")
+	slimBuilder.setAxisHeader(clonotypeKeyAxisSpec, "clonotypeKey")
+	slimBuilder.add(matchedCountCol, { header: inputs.countCol })
+	slimBuilder.add(matchedSeqCol, { header: inputs.seqCol })
+
+	result := exec.builder().
+		software(errorCorrectionSw).
+		arg("--input_tsv").arg("input.tsv").
+		arg("--output_tsv").arg("output.tsv").
+		arg("--seq_col").arg(inputs.seqCol).
+		arg("--count_col").arg(inputs.countCol).
+		arg("--max_hd").arg(string(inputs.maxHd)).
+		arg("--min_ratio").arg(string(inputs.minRatio)).
+		arg("--lower_cutoff").arg(string(inputs.lowerCutoff)).
+		addFile("input.tsv", slimBuilder.build()).
+		saveFile("output.tsv").
+		printErrStreamToStdout().
+		run()
+
+	outputTsv := result.getFile("output.tsv")
+	outputPf := xsv.importFile(outputTsv, "tsv", {
+		axes: [
+			{ column: "sampleId", spec: sampleIdAxisSpec },
+			{ column: "clonotypeKey", spec: clonotypeKeyAxisSpec }
+		],
+		columns: [
+			{ column: inputs.countCol, spec: maps.clone(matchedCountCol.spec) },
+			{ column: inputs.seqCol, spec: maps.clone(matchedSeqCol.spec) }
+		],
+		storageFormat: "Parquet",
+		partitionKeyLength: 1
+	}, { splitDataAndSpec: true })
+
+	pfBuilder := pframes.pFrameBuilder()
+	for k, v in outputPf {
+		pfBuilder.add(k, v.spec, v.data)
+	}
+	return { pf: pfBuilder.build() }
+})
