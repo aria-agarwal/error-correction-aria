@@ -1,5 +1,6 @@
 
 import argparse
+import sys
 
 import numpy as np
 import pandas as pd
@@ -58,11 +59,18 @@ def main():
     if missing_columns:
         raise ValueError(f"Input TSV is missing columns: {sorted(missing_columns)}")
 
+    print(f"Received {len(clones)} input rows.", file=sys.stderr, flush=True)
+
     clones = clones.dropna(subset=[args.seq_col, args.count_col]).copy()
     clones[args.seq_col] = clones[args.seq_col].astype(str)
     clones[args.count_col] = pd.to_numeric(clones[args.count_col], errors="raise")
 
     seq_raw_count = clones.groupby(args.seq_col)[args.count_col].sum()
+    print(
+        f"Comparing {len(seq_raw_count)} unique sequences by Hamming distance.",
+        file=sys.stderr,
+        flush=True,
+    )
     log10_seq_raw_count = np.log10(seq_raw_count).reset_index()
     compare = infer_parents_hamming(
         log10_seq_raw_count,

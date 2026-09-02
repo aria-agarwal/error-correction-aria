@@ -1,4 +1,4 @@
-import { platforma } from "@platforma-open/platforma-aria.test.model";
+import { platforma } from "@platforma-aria/platforma-aria.error-correction-aria.model";
 import { defineAppV3 } from "@platforma-sdk/ui-vue";
 import MainPage from "./pages/MainPage.vue";
 

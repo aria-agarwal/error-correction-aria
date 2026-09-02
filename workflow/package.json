@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-aria.test.workflow",
+  "name": "@platforma-aria/platforma-aria.error-correction-aria.workflow",
   "version": "1.0.0",
   "description": "Block Workflow",
   "type": "module",
@@ -9,7 +9,7 @@
     "format": "/usr/bin/env emacs --script ./format.el"
   },
   "dependencies": {
-    "@platforma-open/platforma-aria.test.software": "workspace:*",
+    "@platforma-aria/platforma-aria.error-correction-aria.software": "workspace:*",
     "@platforma-sdk/workflow-tengo": "catalog:"
   },
   "devDependencies": {

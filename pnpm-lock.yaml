@@ -75,13 +75,13 @@ importers:
 
   block:
     dependencies:
-      '@platforma-open/platforma-aria.test.model':
+      '@platforma-aria/platforma-aria.error-correction-aria.model':
         specifier: workspace:*
         version: link:../model
-      '@platforma-open/platforma-aria.test.ui':
+      '@platforma-aria/platforma-aria.error-correction-aria.ui':
         specifier: workspace:*
         version: link:../ui
-      '@platforma-open/platforma-aria.test.workflow':
+      '@platforma-aria/platforma-aria.error-correction-aria.workflow':
         specifier: workspace:*
         version: link:../workflow
       '@platforma-sdk/model':
@@ -126,7 +126,7 @@ importers:
   test:
     dependencies:
       this-block:
-        specifier: workspace:@platforma-open/platforma-aria.test@*
+        specifier: workspace:@platforma-aria/platforma-aria.error-correction-aria@*
         version: link:../block
       typescript:
         specifier: '*'
@@ -141,7 +141,7 @@ importers:
 
   ui:
     dependencies:
-      '@platforma-open/platforma-aria.test.model':
+      '@platforma-aria/platforma-aria.error-correction-aria.model':
         specifier: workspace:*
         version: link:../model
       '@platforma-sdk/ui-vue':
@@ -169,7 +169,7 @@ importers:
 
   workflow:
     dependencies:
-      '@platforma-open/platforma-aria.test.software':
+      '@platforma-aria/platforma-aria.error-correction-aria.software':
         specifier: workspace:*
         version: link:../software
       '@platforma-sdk/workflow-tengo':

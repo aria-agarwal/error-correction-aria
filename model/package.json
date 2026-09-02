@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-aria.test.model",
+  "name": "@platforma-aria/platforma-aria.error-correction-aria.model",
   "version": "1.0.0",
   "description": "Block model",
   "type": "module",
