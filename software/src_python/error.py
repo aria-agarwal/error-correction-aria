@@ -1,91 +1,46 @@
 
 import argparse
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 
-def hamming_distance(s1, s2):
-    """Assumes equal length"""
-    return sum(c1 != c2 for c1, c2 in zip(s1, s2))
+def hamming_distance(first_sequence, second_sequence):
+    return sum(first != second for first, second in zip(first_sequence, second_sequence))
 
-def infer_parents_hamming(
-    df,
-    seq_col="sequence_aa",
-    count_col="log10_count",
-    max_hd=2,
-    min_ratio=100
-):
-    """
-    df: DataFrame containing sequences and log10 counts
-    seq_col: column name for amino acid sequence
-    count_col: column name for log10(count)
-    max_hd: max Hamming distance
-    min_ratio: parent must be >= min_ratio more abundant than child
-    """
 
-    df = df.copy()
-
-    # precompute length
-    df["_length"] = df[seq_col].str.len()
-
+def infer_parents_hamming(dataframe, sequence_column, count_column, max_distance, min_ratio):
+    dataframe = dataframe.copy()
+    dataframe["_length"] = dataframe[sequence_column].str.len()
     log10_ratio = np.log10(min_ratio)
-
     results = []
 
-    for length, g in df.groupby("_length"):
-        
-        
-        g = g.sort_values(count_col, ascending=False).reset_index(drop=True)
+    for length, group in dataframe.groupby("_length"):
+        group = group.sort_values(count_column, ascending=False).reset_index(drop=True)
+        sequences = group[sequence_column].tolist()
+        log_counts = group[count_column].tolist()
 
-        seqs = g[seq_col].tolist()
-        log_counts = g[count_col].tolist()
-
-        for i in range(len(seqs)):
-            child_seq = seqs[i]
-            child_logc = log_counts[i]
-
-            for j in range(i):  # higher-abundance candidates
-
-                
-                parent_seq = seqs[j]
-                parent_logc = log_counts[j]
-
-                log_diff = parent_logc - child_logc
-
-                """
-                if length==21 and hd<3:
-                    
-                    if log_diff < log10_ratio:
-                        print('fail', hd, log_diff, child_seq, child_logc, parent_seq, parent_logc)
-                    else:
-                        print('pass', hd, log_diff, child_seq, child_logc, parent_seq, parent_logc)
-                """
-                # abundance constraint in log space
-                if log_diff < log10_ratio:
+        for child_index, child_sequence in enumerate(sequences):
+            child_log_count = log_counts[child_index]
+            for parent_index in range(child_index):
+                parent_sequence = sequences[parent_index]
+                parent_log_count = log_counts[parent_index]
+                if parent_log_count - child_log_count < log10_ratio:
                     continue
 
-                hd = hamming_distance(child_seq, parent_seq)
-                    
-                if hd <= max_hd:
+                distance = hamming_distance(child_sequence, parent_sequence)
+                if distance <= max_distance:
                     results.append({
                         "length": length,
-                        "child_seq": child_seq,
-                        "child_log10_count": child_logc,
-                        "parent_seq": parent_seq,
-                        "parent_log10_count": parent_logc,
-                        "hamming_distance": hd
+                        "child_seq": child_sequence,
+                        "parent_seq": parent_sequence,
+                        "hamming_distance": distance,
                     })
 
     return pd.DataFrame(results)
 
 
-def run_stats():
-    
-    
-    return filtered_clones
-
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_tsv", required=True)
     parser.add_argument("--output_tsv", required=True)
@@ -98,26 +53,49 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     clones = pd.read_table(args.input_tsv)
-    
+    required_columns = {"clonotypeKey", args.seq_col, args.count_col}
+    missing_columns = required_columns - set(clones.columns)
+    if missing_columns:
+        raise ValueError(f"Input TSV is missing columns: {sorted(missing_columns)}")
 
-    seq_raw_count = clones.groupby(args._get_argsseq_col)[args.count_col].sum()
+    clones = clones.dropna(subset=[args.seq_col, args.count_col]).copy()
+    clones[args.seq_col] = clones[args.seq_col].astype(str)
+    clones[args.count_col] = pd.to_numeric(clones[args.count_col], errors="raise")
+
+    seq_raw_count = clones.groupby(args.seq_col)[args.count_col].sum()
     log10_seq_raw_count = np.log10(seq_raw_count).reset_index()
     compare = infer_parents_hamming(
-            log10_seq_raw_count,
-            seq_col=args.seq_col,
-            count_col=args.count_col,
-            max_hd=args.max_hd,
-            min_ratio=args.min_ratio)
+        log10_seq_raw_count,
+        sequence_column=args.seq_col,
+        count_column=args.count_col,
+        max_distance=args.max_hd,
+        min_ratio=args.min_ratio,
+    )
 
-    compare['log10_diff'] = compare.parent_log10_count - compare.child_log10_count
-    log10_seq_filtered_count = log10_seq_raw_count[~log10_seq_raw_count[args.seq_col].isin(compare.child_seq)].copy()
-    log10_seq_filtered_count = log10_seq_filtered_count[log10_seq_filtered_count[args.count_col]>np.log10(args.lower_cutoff)].copy()
-    filtered_clones = clones[clones[args.seq_col].isin(log10_seq_filtered_count[args.seq_col])].drop_duplicates(args.seq_col)
-    filtered_clones = filtered_clones[filtered_clones[args.count_col]>args.lower_cutoff].drop_duplicates(args.seq_col)
+    child_sequences = compare["child_seq"] if not compare.empty else []
+    surviving_sequences = log10_seq_raw_count[
+        ~log10_seq_raw_count[args.seq_col].isin(child_sequences)
+    ]
+    surviving_sequences = surviving_sequences[
+        surviving_sequences[args.count_col] > np.log10(args.lower_cutoff)
+    ]
+    filtered_clones = (
+        clones[clones[args.seq_col].isin(surviving_sequences[args.seq_col])]
+        .sort_values(args.count_col, ascending=False)
+        .drop_duplicates(args.seq_col)
+    )
 
     filtered_clones.to_csv(args.output_tsv, sep="\t", index=False)
     if args.output_keys_tsv:
         surviving_keys = filtered_clones[["clonotypeKey"]].drop_duplicates()
         surviving_keys.to_csv(args.output_keys_tsv, sep="\t", index=False)
-    print(f"Done: {len(filtered_clones)} clones written to {args.output_tsv}", flush=True)
-        
+    print(
+        f"Done: {len(filtered_clones)} representative clones written to {args.output_tsv} "
+        f"(from {len(surviving_sequences)} surviving sequences)",
+        flush=True,
+    )
+
+
+if __name__ == "__main__":
+    main()
+    

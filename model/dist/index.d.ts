@@ -1,16 +1,41 @@
 import * as _$_platforma_sdk_model0 from "@platforma-sdk/model";
-import { InferOutputsType } from "@platforma-sdk/model";
+import { InferOutputsType, PlRef } from "@platforma-sdk/model";
 
 //#region src/index.d.ts
 type BlockData = {
-  name: string;
+  inputRef?: PlRef;
+  seqCol: string;
+  countCol: string;
+  maxHd: number;
+  minRatio: number;
+  lowerCutoff: number;
 };
 declare const platforma: _$_platforma_sdk_model0.PlatformaExtended<_$_platforma_sdk_model0.PlatformaV3<BlockData, {
-  name: string;
+  inputRef: Readonly<{
+    __isRef: true;
+    blockId: string;
+    name: string;
+    requireEnrichments?: true | undefined;
+  }> | undefined;
+  seqCol: string;
+  countCol: string;
+  maxHd: number;
+  minRatio: number;
+  lowerCutoff: number;
 }, _$_platforma_sdk_model0.InferOutputsFromLambdas<{
-  tengoMessage: _$_platforma_sdk_model0.ConfigRenderLambda<{}>;
+  inputOptions: _$_platforma_sdk_model0.ConfigRenderLambda<{
+    readonly ref: {
+      readonly __isRef: true;
+      readonly blockId: string;
+      readonly name: string;
+      readonly requireEnrichments?: true | undefined | undefined;
+    };
+    readonly label: string;
+  }[]>;
 } & {
-  pythonMessage: _$_platforma_sdk_model0.ConfigRenderLambda<string | undefined>;
+  isRunning: _$_platforma_sdk_model0.ConfigRenderLambda<boolean>;
+} & {
+  hasResult: _$_platforma_sdk_model0.ConfigRenderLambda<boolean>;
 }>, "/", {}, _$_platforma_sdk_model0.BlockDefaultUiServices>>;
 type BlockOutputs = InferOutputsType<typeof platforma>;
 //#endregion

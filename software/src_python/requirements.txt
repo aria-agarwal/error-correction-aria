@@ -1,1 +1,2 @@
-# No dependencies specified for this script
+numpy
+pandas
