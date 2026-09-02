@@ -89,6 +89,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_tsv", required=True)
     parser.add_argument("--output_tsv", required=True)
+    parser.add_argument("--output_keys_tsv", required=False, default=None)
     parser.add_argument("--seq_col", default="aaSeqCDR3")
     parser.add_argument("--count_col", default="readCount")
     parser.add_argument("--max_hd", type=int, default=2)
@@ -115,4 +116,8 @@ if __name__ == "__main__":
     filtered_clones = filtered_clones[filtered_clones[args.count_col]>args.lower_cutoff].drop_duplicates(args.seq_col)
 
     filtered_clones.to_csv(args.output_tsv, sep="\t", index=False)
+    if args.output_keys_tsv:
+        surviving_keys = filtered_clones[["clonotypeKey"]].drop_duplicates()
+        surviving_keys.to_csv(args.output_keys_tsv, sep="\t", index=False)
     print(f"Done: {len(filtered_clones)} clones written to {args.output_tsv}", flush=True)
+        
