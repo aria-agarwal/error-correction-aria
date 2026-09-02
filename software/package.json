@@ -24,10 +24,10 @@
       }
     },
     "entrypoints": {
-      "hello-world-python": {
+      "error-correction": {
         "binary": {
           "artifact": "py-archive",
-          "cmd": [ "python", "{pkg}/hello.py" ]
+          "cmd": [ "python", "{pkg}/error.py" ]
         }
       }
     }
