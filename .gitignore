@@ -1,0 +1,40 @@
+# Authentication and local settings
+.test_auth.json
+.vscode/sftp.json
+test-dry-run.json
+
+# Dependencies and generated builds
+node_modules/
+dist/
+block-pack/
+.turbo
+vite.config.*.timestamp-*
+
+# Local Platforma/runtime files
+dev/
+work/
+log/
+
+# Generated software artifacts
+software/**/*.sw.json
+software/**/*.tgz
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+DocumentRevisions-V100
+fseventsd
+Spotlight-V100
+TemporaryItems
+Trashes
+VolumeIcon.icns
+com.apple.timemachine.donotpresent
+Network Trash Folder
+Temporary Items
+.apdisk
