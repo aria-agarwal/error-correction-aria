@@ -5,6 +5,7 @@ assets := import("@platforma-sdk/workflow-tengo:assets")
 pframes := import("@platforma-sdk/workflow-tengo:pframes")
 pSpec := import("@platforma-sdk/workflow-tengo:pframes.spec")
 xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
+pt := import("@platforma-sdk/workflow-tengo:pt")
 maps := import("@platforma-sdk/workflow-tengo:maps")
 
 errorCorrectionSw := assets.importSoftware("@platforma-open/platforma-aria.test.software:error-correction")
@@ -13,9 +14,18 @@ self.awaitState("columns", "PColumnBundle")
 self.defineOutputs("pf")
 
 self.body(func(inputs) {
-	abundanceCols := inputs.columns.getColumns("abundanceCols")
-	propertyCols := inputs.columns.getColumns("propertyCols")
+	columns := inputs.columns
+	seqCol := inputs.seqCol
+	countCol := inputs.countCol
+	maxHd := inputs.maxHd
+	minRatio := inputs.minRatio
+	lowerCutoff := inputs.lowerCutoff
+	blockId := inputs.blockId
+
+	abundanceCols := columns.getColumns("abundanceCols")
+	propertyCols := columns.getColumns("propertyCols")
 	ll.assert(len(abundanceCols) > 0, "No abundance columns found in selected dataset")
+	ll.assert(len(propertyCols) > 0, "No property columns found in selected dataset")
 
 	primaryCol := abundanceCols[0]
 	for _, col in abundanceCols {
@@ -24,66 +34,146 @@ self.body(func(inputs) {
 			break
 		}
 	}
+
 	sampleIdAxisSpec := primaryCol.spec.axesSpec[0]
 	clonotypeKeyAxisSpec := primaryCol.spec.axesSpec[1]
 
-	matchedCountCol := undefined
-	for _, col in abundanceCols {
-		label := col.spec.annotations["pl7.app/label"]
-		if label == inputs.countCol || col.spec.name == inputs.countCol || (inputs.countCol == "readCount" && label == "Number Of Reads") {
-			matchedCountCol = col
-			break
-		}
-	}
-	ll.assert(matchedCountCol != undefined, "Cannot resolve count column '" + inputs.countCol + "'")
-
-	matchedSeqCol := undefined
-	for _, col in propertyCols {
-		label := col.spec.annotations["pl7.app/label"]
-		if label == inputs.seqCol || col.spec.name == inputs.seqCol || (inputs.seqCol == "aaSeqCDR3" && label == "CDR3 aa") {
-			matchedSeqCol = col
-			break
-		}
-	}
-	ll.assert(matchedSeqCol != undefined, "Cannot resolve sequence column '" + inputs.seqCol + "'")
+	datasetSpec := columns.getSpec("main")
+	trace := pSpec.makeTrace(datasetSpec, {
+		type: "platforma-aria.custom-error-correction",
+		importance: 30,
+		label: "Error Corrected"
+	})
 
 	slimBuilder := pframes.tsvFileBuilder()
 	slimBuilder.setAxisHeader(sampleIdAxisSpec, "sampleId")
 	slimBuilder.setAxisHeader(clonotypeKeyAxisSpec, "clonotypeKey")
-	slimBuilder.add(matchedCountCol, { header: inputs.countCol })
-	slimBuilder.add(matchedSeqCol, { header: inputs.seqCol })
 
-	result := exec.builder().
+	matchedCountCol := undefined
+	availableCountLabels := []
+	for _, col in abundanceCols {
+		label := col.spec.annotations["pl7.app/label"]
+		if is_undefined(label) {
+			label = col.spec.name
+		}
+		availableCountLabels = append(availableCountLabels, label)
+		if label == countCol || col.spec.name == countCol || (countCol == "readCount" && (label == "Number Of Reads" || label == "number_of_reads")) {
+			matchedCountCol = col
+			break
+		}
+	}
+	ll.assert(matchedCountCol != undefined, "Cannot resolve count column '" + countCol + "'. Available abundance labels: " + string(availableCountLabels))
+	slimBuilder.add(matchedCountCol, { header: countCol })
+
+	matchedSeqCol := undefined
+	availableSeqLabels := []
+	for _, col in propertyCols {
+		label := col.spec.annotations["pl7.app/label"]
+		if is_undefined(label) {
+			label = col.spec.name
+		}
+		if col.spec.name == "pl7.app/vdj/sequence" {
+			availableSeqLabels = append(availableSeqLabels, label)
+		}
+		if label == seqCol || col.spec.name == seqCol || (seqCol == "aaSeqCDR3" && label == "CDR3 aa") {
+			matchedSeqCol = col
+			break
+		}
+	}
+	ll.assert(matchedSeqCol != undefined, "Cannot resolve sequence column '" + seqCol + "'. Available VDJ sequence labels: " + string(availableSeqLabels))
+	slimBuilder.add(matchedSeqCol, { header: seqCol })
+
+	abundanceBuilder := pframes.tsvFileBuilder()
+	abundanceBuilder.setAxisHeader(sampleIdAxisSpec, "sampleId")
+	abundanceBuilder.setAxisHeader(clonotypeKeyAxisSpec, "clonotypeKey")
+	for i, col in abundanceCols {
+		abundanceBuilder.add(col, { header: "abundance_" + string(i) })
+	}
+
+	propsBuilder := pframes.tsvFileBuilder()
+	propsBuilder.setAxisHeader(clonotypeKeyAxisSpec, "clonotypeKey")
+	for i, col in propertyCols {
+		propsBuilder.add(col, { header: "prop_" + string(i) })
+	}
+
+	pythonResult := exec.builder().
 		software(errorCorrectionSw).
 		arg("--input_tsv").arg("input.tsv").
 		arg("--output_tsv").arg("output.tsv").
-		arg("--seq_col").arg(inputs.seqCol).
-		arg("--count_col").arg(inputs.countCol).
-		arg("--max_hd").arg(string(inputs.maxHd)).
-		arg("--min_ratio").arg(string(inputs.minRatio)).
-		arg("--lower_cutoff").arg(string(inputs.lowerCutoff)).
+		arg("--output_keys_tsv").arg("surviving_keys.tsv").
+		arg("--seq_col").arg(seqCol).
+		arg("--count_col").arg(countCol).
+		arg("--max_hd").arg(string(maxHd)).
+		arg("--min_ratio").arg(string(minRatio)).
+		arg("--lower_cutoff").arg(string(lowerCutoff)).
 		addFile("input.tsv", slimBuilder.build()).
-		saveFile("output.tsv").
+		saveFile("surviving_keys.tsv").
 		printErrStreamToStdout().
 		run()
 
-	outputTsv := result.getFile("output.tsv")
-	outputPf := xsv.importFile(outputTsv, "tsv", {
+	ptWf := pt.workflow()
+	abundanceDf := ptWf.frame(abundanceBuilder.build(), {xsvType: "tsv"})
+	propsDf := ptWf.frame(propsBuilder.build(), {xsvType: "tsv"})
+	keysDf := ptWf.frame(pythonResult.getFile("surviving_keys.tsv"), {xsvType: "tsv"})
+
+	filteredAbundance := abundanceDf.join(keysDf, {on: "clonotypeKey", how: "inner"})
+	filteredProps := propsDf.join(keysDf, {on: "clonotypeKey", how: "inner"})
+	filteredAbundance.save("filtered_abundance.tsv")
+	filteredProps.save("filtered_props.tsv")
+
+	ptResult := ptWf.run()
+	filteredAbundanceTsv := ptResult.getFile("filtered_abundance.tsv")
+	filteredPropsTsv := ptResult.getFile("filtered_props.tsv")
+
+	newClonotypeKeySpec := maps.clone(clonotypeKeyAxisSpec)
+	newClonotypeKeySpec.domain = maps.merge(newClonotypeKeySpec.domain, {
+		"pl7.app/filteredBy": blockId
+	})
+
+	abundanceImportCols := []
+	for i, col in abundanceCols {
+		newSpec := maps.clone(col.spec)
+		delete(newSpec, "axesSpec")
+		abundanceImportCols = append(abundanceImportCols, {
+			column: "abundance_" + string(i),
+			spec: newSpec
+		})
+	}
+
+	propImportCols := []
+	for i, col in propertyCols {
+		newSpec := maps.clone(col.spec)
+		delete(newSpec, "axesSpec")
+		propImportCols = append(propImportCols, {
+			column: "prop_" + string(i),
+			spec: newSpec
+		})
+	}
+
+	abundancePf := xsv.importFile(filteredAbundanceTsv, "tsv", {
 		axes: [
 			{ column: "sampleId", spec: sampleIdAxisSpec },
-			{ column: "clonotypeKey", spec: clonotypeKeyAxisSpec }
+			{ column: "clonotypeKey", spec: newClonotypeKeySpec }
 		],
-		columns: [
-			{ column: inputs.countCol, spec: maps.clone(matchedCountCol.spec) },
-			{ column: inputs.seqCol, spec: maps.clone(matchedSeqCol.spec) }
-		],
+		columns: abundanceImportCols,
 		storageFormat: "Parquet",
 		partitionKeyLength: 1
 	}, { splitDataAndSpec: true })
 
+	propsPf := xsv.importFile(filteredPropsTsv, "tsv", {
+		axes: [{ column: "clonotypeKey", spec: newClonotypeKeySpec }],
+		columns: propImportCols,
+		storageFormat: "Parquet",
+		partitionKeyLength: 0
+	}, { splitDataAndSpec: true })
+
 	pfBuilder := pframes.pFrameBuilder()
-	for k, v in outputPf {
-		pfBuilder.add(k, v.spec, v.data)
+	for k, v in abundancePf {
+		pfBuilder.add(k, trace.inject(v.spec), v.data)
 	}
+	for k, v in propsPf {
+		pfBuilder.add(k, trace.inject(v.spec), v.data)
+	}
+
 	return { pf: pfBuilder.build() }
 })

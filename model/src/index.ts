@@ -50,6 +50,17 @@ export const platforma = BlockModelV3.create(dataModel)
 
   .output("isRunning", (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
+  // The workflow exports a pframe as `pf`; use its presence as completion signal.
+  .output(
+    "hasResult",
+    (ctx) =>
+      ctx.outputs?.resolve({
+        field: "pf",
+        assertFieldType: "Input",
+        allowPermanentAbsence: true,
+      }) !== undefined,
+  )
+
   .sections((_ctx) => [{ type: "link", href: "/", label: "Main" }])
 
   .title(() => "Custom Error Correction")

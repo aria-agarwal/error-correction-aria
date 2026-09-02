@@ -9,6 +9,8 @@ wf.body(func(args) {
 		return { outputs: {}, exports: {} }
 	}
 
+	blockId := wf.blockId().getDataAsJson()
+
 	anchor := "main"
 	bundleBuilder := wf.createPBundleBuilder()
 	bundleBuilder.addAnchor(anchor, args.inputRef)
@@ -23,6 +25,7 @@ wf.body(func(args) {
 
 	result := render.createEphemeral(processTpl, {
 		columns: bundleBuilder.build(),
+		blockId: blockId,
 		seqCol: args.seqCol,
 		countCol: args.countCol,
 		maxHd: args.maxHd,
