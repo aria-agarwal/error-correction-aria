@@ -1,5 +1,5 @@
 
-import os
+import argparse
 import pandas as pd
 import numpy as np
 
@@ -80,34 +80,39 @@ def infer_parents_hamming(
 
 
 def run_stats():
-    seq_raw_count = clones.groupby(seq_col)[count_col].sum()
     
-    
-    log10_seq_raw_count = np.log10(seq_raw_count).reset_index()
-    
-    compare = infer_parents_hamming(
-        log10_seq_raw_count,
-        seq_col=seq_col,
-        count_col=count_col,
-        max_hd=max_hd,
-        min_ratio=min_ratio)
-    
-    compare['log10_diff'] = compare.parent_log10_count - compare.child_log10_count
-    log10_seq_filtered_count = log10_seq_raw_count[~log10_seq_raw_count[seq_col].isin(compare.child_seq)].copy()
-    log10_seq_filtered_count = log10_seq_filtered_count[log10_seq_filtered_count[count_col]>np.log10(lower_cutoff)].copy()
-    filtered_clones = clones[clones[seq_col].isin(log10_seq_filtered_count[seq_col])].drop_duplicates(seq_col)
-    filtered_clones = filtered_clones[filtered_clones[count_col]>lower_cutoff].drop_duplicates(seq_col)
     
     return filtered_clones
 
 
 if __name__ == "__main__":
-    clones = pd.read_table('/Users/ehq3930/Downloads/PCPE1_VHH_01_005.clones_IGH.tsv.gz')
-    lower_cutoff = 5
-    seq_col="aaSeqCDR3" # this can con
-    count_col="readCount"
-    max_hd=2
-    min_ratio=100
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_tsv", required=True)
+    parser.add_argument("--output_tsv", required=True)
+    parser.add_argument("--seq_col", default="aaSeqCDR3")
+    parser.add_argument("--count_col", default="readCount")
+    parser.add_argument("--max_hd", type=int, default=2)
+    parser.add_argument("--min_ratio", type=float, default=100)
+    parser.add_argument("--lower_cutoff", type=float, default=5)
+    args = parser.parse_args()
 
-    filtered_clones = run_stats()
-    print(filtered_clones)  
+    clones = pd.read_table(args.input_tsv)
+    
+
+    seq_raw_count = clones.groupby(args._get_argsseq_col)[args.count_col].sum()
+    log10_seq_raw_count = np.log10(seq_raw_count).reset_index()
+    compare = infer_parents_hamming(
+            log10_seq_raw_count,
+            seq_col=args.seq_col,
+            count_col=args.count_col,
+            max_hd=args.max_hd,
+            min_ratio=args.min_ratio)
+
+    compare['log10_diff'] = compare.parent_log10_count - compare.child_log10_count
+    log10_seq_filtered_count = log10_seq_raw_count[~log10_seq_raw_count[args.seq_col].isin(compare.child_seq)].copy()
+    log10_seq_filtered_count = log10_seq_filtered_count[log10_seq_filtered_count[args.count_col]>np.log10(args.lower_cutoff)].copy()
+    filtered_clones = clones[clones[args.seq_col].isin(log10_seq_filtered_count[args.seq_col])].drop_duplicates(args.seq_col)
+    filtered_clones = filtered_clones[filtered_clones[args.count_col]>args.lower_cutoff].drop_duplicates(args.seq_col)
+
+    filtered_clones.to_csv(args.output_tsv, sep="\t", index=False)
+    print(f"Done: {len(filtered_clones)} clones written to {args.output_tsv}", flush=True)
