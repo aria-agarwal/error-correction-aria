@@ -1,21 +1,58 @@
-import type { InferOutputsType } from "@platforma-sdk/model";
+import type { InferOutputsType, PlRef } from "@platforma-sdk/model";
 import { BlockModelV3, DataModelBuilder } from "@platforma-sdk/model";
 
 export type BlockData = {
-  name: string;
+  inputRef?: PlRef;
+  seqCol: string;
+  countCol: string;
+  maxHd: number;
+  minRatio: number;
+  lowerCutoff: number;
 };
 
-const dataModel = new DataModelBuilder().from<BlockData>("v1").init(() => ({ name: "" }));
+const dataModel = new DataModelBuilder().from<BlockData>("v1").init(() => ({
+  seqCol: "aaSeqCDR3",
+  countCol: "readCount",
+  maxHd: 2,
+  minRatio: 100,
+  lowerCutoff: 5,
+}));
 
 export const platforma = BlockModelV3.create(dataModel)
 
-  .args((data) => ({ name: data.name }))
+  .args((data) => ({
+    inputRef: data.inputRef,
+    seqCol: data.seqCol,
+    countCol: data.countCol,
+    maxHd: data.maxHd,
+    minRatio: data.minRatio,
+    lowerCutoff: data.lowerCutoff,
+  }))
 
-  .output("tengoMessage", (ctx) => ctx.outputs?.resolve("tengoMessage")?.getDataAsJson())
+  .output(
+    "inputOptions",
+    (ctx) =>
+      ctx.resultPool.getOptions(
+        [
+          {
+            axes: [{ name: "pl7.app/sampleId" }, { name: "pl7.app/vdj/clonotypeKey" }],
+            annotations: { "pl7.app/isAnchor": "true" },
+          },
+        ],
+        {
+          label: {
+            includeNativeLabel: false,
+            forceTraceElements: ["milaboratories.samples-and-data/dataset"],
+          },
+        },
+      ) ?? [],
+  )
 
-  .output("pythonMessage", (ctx) => ctx.outputs?.resolve("pythonMessage")?.getDataAsString())
+  .output("isRunning", (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
   .sections((_ctx) => [{ type: "link", href: "/", label: "Main" }])
+
+  .title(() => "Custom Error Correction")
 
   .done();
 
