@@ -24,7 +24,7 @@
       "ui": "@platforma-open/platforma-aria.test.ui/dist"
     },
     "meta": {
-      "title": "Aria Test",
+      "title": "error-correction-aria",
       "logo": "file:../logos/block-logo.png",
       "url": "https://github.com/platforma-open/platforma-aria.test",
       "support": "mailto:support@milaboratories.com",
