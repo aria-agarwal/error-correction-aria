@@ -32,5 +32,6 @@ const app = useApp();
       :min-value="0"
       :step="1"
     />
+    <pre v-if="app.model.outputs.pythonMessage">{{ app.model.outputs.pythonMessage }}</pre>
   </PlBlockPage>
 </template>

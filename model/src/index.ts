@@ -50,6 +50,8 @@ export const platforma = BlockModelV3.create(dataModel)
 
   .output("isRunning", (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
+  .output("pythonMessage", (ctx) => ctx.outputs?.resolve("pythonMessage")?.getDataAsString())
+
   // The workflow exports a pframe as `pf`; use its presence as completion signal.
   .output(
     "hasResult",

@@ -35,6 +35,8 @@ declare const platforma: _$_platforma_sdk_model0.PlatformaExtended<_$_platforma_
 } & {
   isRunning: _$_platforma_sdk_model0.ConfigRenderLambda<boolean>;
 } & {
+  pythonMessage: _$_platforma_sdk_model0.ConfigRenderLambda<string | undefined>;
+} & {
   hasResult: _$_platforma_sdk_model0.ConfigRenderLambda<boolean>;
 }>, "/", {}, _$_platforma_sdk_model0.BlockDefaultUiServices>>;
 type BlockOutputs = InferOutputsType<typeof platforma>;

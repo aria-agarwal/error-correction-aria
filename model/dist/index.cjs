@@ -21,7 +21,7 @@ const platforma = _platforma_sdk_model.BlockModelV3.create(dataModel).args((data
 }], { label: {
 	includeNativeLabel: false,
 	forceTraceElements: ["milaboratories.samples-and-data/dataset"]
-} }) ?? []).output("isRunning", (ctx) => ctx.outputs?.getIsReadyOrError() === false).output("hasResult", (ctx) => ctx.outputs?.resolve({
+} }) ?? []).output("isRunning", (ctx) => ctx.outputs?.getIsReadyOrError() === false).output("pythonMessage", (ctx) => ctx.outputs?.resolve("pythonMessage")?.getDataAsString()).output("hasResult", (ctx) => ctx.outputs?.resolve({
 	field: "pf",
 	assertFieldType: "Input",
 	allowPermanentAbsence: true

@@ -34,7 +34,10 @@ wf.body(func(args) {
 	})
 
 	return {
-		outputs: { pf: result.output("pf") },
+		outputs: {
+			pf: result.output("pf"),
+			pythonMessage: result.output("pythonMessage")
+		},
 		exports: { pf: result.output("pf") }
 	}
 })

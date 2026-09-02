@@ -1,5 +1,6 @@
 
 import argparse
+import sys
 import pandas as pd
 import numpy as np
 
@@ -98,7 +99,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     clones = pd.read_table(args.input_tsv)
-    
 
     seq_raw_count = clones.groupby(args.seq_col)[args.count_col].sum()
     log10_seq_raw_count = np.log10(seq_raw_count).reset_index()
@@ -112,8 +112,14 @@ if __name__ == "__main__":
     compare['log10_diff'] = compare.parent_log10_count - compare.child_log10_count
     log10_seq_filtered_count = log10_seq_raw_count[~log10_seq_raw_count[args.seq_col].isin(compare.child_seq)].copy()
     log10_seq_filtered_count = log10_seq_filtered_count[log10_seq_filtered_count[args.count_col]>np.log10(args.lower_cutoff)].copy()
-    log10_seq_filtered_count = log10_seq_filtered_count[log10_seq_filtered_count[args.count_col]>np.log10(args.lower_cutoff)].copy()
     filtered_clones = clones[clones[args.seq_col].isin(log10_seq_filtered_count[args.seq_col])].drop_duplicates(args.seq_col)
+
+    print(
+        f"Input rows: {len(clones)}; unique sequences: {len(seq_raw_count)}; "
+        f"error-corrected children: {len(compare)}; survivors above cutoff: {len(filtered_clones)}",
+        file=sys.stderr,
+        flush=True,
+    )
 
     filtered_clones.to_csv(args.output_tsv, sep="\t", index=False)
     if args.output_keys_tsv:
