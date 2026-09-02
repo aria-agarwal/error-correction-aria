@@ -1,0 +1,18 @@
+
+
+> @platforma-open/platforma-aria.test.model@1.0.0 build /Users/ehq3930/Documents/Platforma_Github/test/model
+> ts-builder build --target block-model && block-tools build-model
+
+Building block-model project...
+↳ cli.mjs -c /Users/ehq3930/Documents/Platforma_Github/test/node_modules/.pnpm/@milaboratories+ts-builder@1.3.1_@types+node@25.3.2_rollup@4.53.3_vue@3.5.25_typescript@5.6.3__yaml@2.8.1/node_modules/@milaboratories/ts-builder/dist/configs/rolldown.block-model.config.js
+[2m<DIR>/[22m[32mindex.d.ts.map  [39m[2masset[22m[2m │ size: 0.24 kB[22m                                                                           
+[2m<DIR>/[22m[32mindex.js.map    [39m[2masset[22m[2m │ size: 1.20 kB[22m                                                                           
+[2m<DIR>/[22m[36mindex.js        [39m[2mchunk[22m[2m │ size: 0.58 kB[22m                                                                           
+[2m<DIR>/[22m[36mindex.d.ts      [39m[2mchunk[22m[2m │ size: 0.74 kB[22m                                                                           
+[2m<DIR>/[22m[32mindex.cjs.map  [39m[2masset[22m[2m │ size: 1.25 kB[22m                                                                            
+[2m<DIR>/[22m[36mindex.cjs      [39m[2mchunk[22m[2m │ size: 0.70 kB[22m                                                                            
+[2m<DIR>/[22m[32mbundle.js.map  [39m[2masset[22m[2m │ size: 733.16 kB[22m                                                                          
+[2m<DIR>/[22m[36mbundle.js      [39m[2mchunk[22m[2m │ size: 380.59 kB[22m                                                                          
+                                                                                                                      
+[32m✔[39m rolldown v1.0.0-rc.16 Finished in [32m1.61 s[39m                                                                           
+Build completed successfully

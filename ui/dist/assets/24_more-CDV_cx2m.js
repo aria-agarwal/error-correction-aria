@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path fill="#110529" d="M7 13v-2H5v2zM13 13v-2h-2v2zM19 11h-2v2h2z"/></svg>`;export{e as default};
+//# sourceMappingURL=24_more-CDV_cx2m.js.map

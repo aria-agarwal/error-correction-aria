@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path fill="#110529" d="M2.75 11.25h-1.5v1.5h1.5zM11.25 11.25h1.5v1.5h-1.5zM22.75 11.25h-1.5v1.5h1.5zM7.75 11.25h-1.5v1.5h1.5zM16.25 11.25h1.5v1.5h-1.5z"/></svg>`;export{e as default};
+//# sourceMappingURL=24_linetype-dotted-CaC_hakr.js.map

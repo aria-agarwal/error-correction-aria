@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path fill="#110529" fill-rule="evenodd" d="M8.75 1.5h-1.5a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5M7.25 0a2.25 2.25 0 0 0 0 4.5h1.5a2.25 2.25 0 0 0 0-4.5zm.55 11.544 7.222-7.007-1.044-1.077L7.8 9.453 5.523 7.238 4.477 8.314zM1 4.5a3 3 0 0 1 2.5-2.959v1.544a1.5 1.5 0 0 0-1 1.415V13A1.5 1.5 0 0 0 4 14.5h8a1.5 1.5 0 0 0 1.5-1.5V9H15v4a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3z" clip-rule="evenodd"/></svg>`;export{e as default};
+//# sourceMappingURL=16_clipboard-copied-Buaho4kk.js.map

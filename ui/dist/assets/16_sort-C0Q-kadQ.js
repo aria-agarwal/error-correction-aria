@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path fill="#110529" d="M7.47 6.03 5.25 3.81V14h-1.5V3.81L1.53 6.03.47 4.97 4.5.94l4.03 4.03zM14.47 9.97l-2.22 2.22V2h-1.5v10.19L8.53 9.97l-1.06 1.06 4.03 4.03 4.03-4.03z"/></svg>`;export{e as default};
+//# sourceMappingURL=16_sort-C0Q-kadQ.js.map

@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><rect width="18" height="18" x="3" y="3" fill="#C1ADFF" rx="3"/></svg>`;export{e as default};
+//# sourceMappingURL=24_color-fill-CIE06iui.js.map

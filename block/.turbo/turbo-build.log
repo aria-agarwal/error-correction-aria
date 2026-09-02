@@ -1,0 +1,5 @@
+
+
+> @platforma-open/platforma-aria.test@1.0.0 build /Users/ehq3930/Documents/Platforma_Github/test/block
+> shx rm -rf ./block-pack && block-tools pack
+

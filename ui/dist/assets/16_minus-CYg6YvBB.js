@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path fill="#110529" fill-rule="evenodd" d="M2.25 7.25h11.5v1.5H2.25z" clip-rule="evenodd"/></svg>`;export{e as default};
+//# sourceMappingURL=16_minus-CYg6YvBB.js.map

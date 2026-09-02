@@ -1,0 +1,19 @@
+
+
+> @platforma-open/platforma-aria.test.ui@1.0.0 check /Users/ehq3930/Documents/Platforma_Github/test/ui
+> ts-builder check --target browser
+
+↳ vue-tsc.js --noEmit --project ./tsconfig.json --customConditions ,
+Linting project...
+↳ oxlint --config /Users/ehq3930/Documents/Platforma_Github/test/ui/.oxlintrc.json --deny-warnings
+Found 0 warnings and 0 errors.
+Finished in 6ms on 3 files with 98 rules using 10 threads.
+Linting completed successfully
+Checking formatting...
+↳ oxfmt --check --config /Users/ehq3930/Documents/Platforma_Github/test/ui/.oxfmtrc.json
+Checking formatting...
+
+All matched files use the correct format.
+Finished in 176ms on 8 files using 10 threads.
+Format check completed successfully
+All checks passed!

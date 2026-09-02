@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><rect width="12.5" height="12.5" x="5.75" y="5.75" stroke="#110529" stroke-width="1.5" rx=".75"/></svg>`;export{e as default};
+//# sourceMappingURL=24_windows-expand-Brz6NMSz.js.map

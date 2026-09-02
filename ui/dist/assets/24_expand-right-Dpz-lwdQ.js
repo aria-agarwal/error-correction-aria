@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path fill="#110529" fill-rule="evenodd" d="m7.576 5.52 5.4 6.48-5.4 6.48-1.152-.96 4.6-5.52-4.6-5.52zm5 0 5.4 6.48-5.4 6.48-1.152-.96 4.6-5.52-4.6-5.52z" clip-rule="evenodd"/></svg>`;export{e as default};
+//# sourceMappingURL=24_expand-right-Dpz-lwdQ.js.map

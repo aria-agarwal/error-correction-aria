@@ -1,0 +1,2 @@
+var e=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path fill="#CFD1DB" d="M6 11.377a.5.5 0 0 0 .834.372l3.753-3.377a.5.5 0 0 0 0-.744L6.834 4.251A.5.5 0 0 0 6 4.623z"/></svg>`;export{e as default};
+//# sourceMappingURL=16_caret-right-BV-IQRFl.js.map
