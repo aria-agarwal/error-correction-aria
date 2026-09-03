@@ -5,6 +5,13 @@ export type BlockData = {
   inputRef?: PlRef;
   seqCol: string;
   countCol: string;
+  cdr1Col: string;
+  cdr2Col: string;
+  cdr3Col: string;
+  fr1Col: string;
+  fr2Col: string;
+  fr3Col: string;
+  fr4Col: string;
   maxHd: number;
   minRatio: number;
   lowerCutoff: number;
@@ -13,6 +20,13 @@ export type BlockData = {
 const dataModel = new DataModelBuilder().from<BlockData>("v1").init(() => ({
   seqCol: "aaSeqCDR3",
   countCol: "readCount",
+  cdr1Col: "",
+  cdr2Col: "",
+  cdr3Col: "",
+  fr1Col: "",
+  fr2Col: "",
+  fr3Col: "",
+  fr4Col: "",
   maxHd: 2,
   minRatio: 100,
   lowerCutoff: 5,
@@ -24,6 +38,13 @@ export const platforma = BlockModelV3.create(dataModel)
     inputRef: data.inputRef,
     seqCol: data.seqCol,
     countCol: data.countCol,
+    cdr1Col: data.cdr1Col,
+    cdr2Col: data.cdr2Col,
+    cdr3Col: data.cdr3Col,
+    fr1Col: data.fr1Col,
+    fr2Col: data.fr2Col,
+    fr3Col: data.fr3Col,
+    fr4Col: data.fr4Col,
     maxHd: data.maxHd,
     minRatio: data.minRatio,
     lowerCutoff: data.lowerCutoff,
