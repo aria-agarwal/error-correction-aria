@@ -184,16 +184,17 @@ self.body(func(inputs) {
 		spec: {
 			name: "pl7.app/vdj/sequenceLength",
 			valueType: "Long",
+			domain: { "pl7.app/vdj/feature": "CDR3" },
 			annotations: { "pl7.app/label": "CDR3 Length" }
 		}
 	})
 	for lengthColumn in [
-		{ source: cdr1Col, column: "cdr1_length", label: "CDR1 Length" },
-		{ source: cdr2Col, column: "cdr2_length", label: "CDR2 Length" },
-		{ source: fr1Col, column: "framework1_length", label: "Framework 1 Length" },
-		{ source: fr2Col, column: "framework2_length", label: "Framework 2 Length" },
-		{ source: fr3Col, column: "framework3_length", label: "Framework 3 Length" },
-		{ source: fr4Col, column: "framework4_length", label: "Framework 4 Length" }
+		{ source: cdr1Col, column: "cdr1_length", label: "CDR1 Length", feature: "CDR1" },
+		{ source: cdr2Col, column: "cdr2_length", label: "CDR2 Length", feature: "CDR2" },
+		{ source: fr1Col, column: "framework1_length", label: "Framework 1 Length", feature: "FR1" },
+		{ source: fr2Col, column: "framework2_length", label: "Framework 2 Length", feature: "FR2" },
+		{ source: fr3Col, column: "framework3_length", label: "Framework 3 Length", feature: "FR3" },
+		{ source: fr4Col, column: "framework4_length", label: "Framework 4 Length", feature: "FR4" }
 	] {
 		if is_undefined(lengthColumn.source) || lengthColumn.source == "" { continue }
 		propImportCols = append(propImportCols, {
@@ -201,6 +202,7 @@ self.body(func(inputs) {
 			spec: {
 				name: "pl7.app/vdj/sequenceLength",
 				valueType: "Long",
+					domain: { "pl7.app/vdj/feature": lengthColumn.feature },
 				annotations: { "pl7.app/label": lengthColumn.label }
 			}
 		})
