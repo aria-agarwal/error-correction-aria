@@ -17,6 +17,7 @@ self.body(func(inputs) {
 	columns := inputs.columns
 	seqCol := inputs.seqCol
 	countCol := inputs.countCol
+	fullLengthCol := inputs.fullLengthCol
 	cdr1Col := inputs.cdr1Col
 	cdr2Col := inputs.cdr2Col
 	fr1Col := inputs.fr1Col
@@ -88,8 +89,17 @@ self.body(func(inputs) {
 	}
 	ll.assert(matchedSeqCol != undefined, "Cannot resolve sequence column '" + seqCol + "'. Available VDJ sequence labels: " + string(availableSeqLabels))
 	slimBuilder.add(matchedSeqCol, { header: seqCol })
+	slimColumnKey := func(col) {
+		return col.spec.name + "|" +
+			string(col.spec.domain["pl7.app/vdj/feature"]) + "|" +
+			string(col.spec.domain["pl7.app/alphabet"]) + "|" +
+			string(col.spec.domain["pl7.app/vdj/chain"]) + "|" +
+			string(col.spec.domain["pl7.app/vdj/pairedRole"])
+	}
+	addedSlimColumns := {}
+	addedSlimColumns[slimColumnKey(matchedSeqCol)] = true
 
-	for _, optionalColName in [cdr1Col, cdr2Col, fr1Col, fr2Col, fr3Col, fr4Col] {
+	for _, optionalColName in [fullLengthCol, cdr1Col, cdr2Col, fr1Col, fr2Col, fr3Col, fr4Col] {
 		if is_undefined(optionalColName) || optionalColName == "" { continue }
 		matchedOptionalCol := undefined
 		for _, col in propertyCols {
@@ -101,7 +111,9 @@ self.body(func(inputs) {
 			}
 		}
 		ll.assert(matchedOptionalCol != undefined, "Cannot resolve optional sequence column '" + optionalColName + "'")
+		if addedSlimColumns[slimColumnKey(matchedOptionalCol)] { continue }
 		slimBuilder.add(matchedOptionalCol, { header: optionalColName })
+		addedSlimColumns[slimColumnKey(matchedOptionalCol)] = true
 	}
 
 	abundanceBuilder := pframes.tsvFileBuilder()
@@ -124,6 +136,7 @@ self.body(func(inputs) {
 		arg("--output_keys_tsv").arg("surviving_keys.tsv").
 		arg("--seq_col").arg(seqCol).
 		arg("--count_col").arg(countCol).
+		arg("--full_length_col").arg(fullLengthCol).
 		arg("--cdr1_col").arg(cdr1Col).
 		arg("--cdr2_col").arg(cdr2Col).
 		arg("--fr1_col").arg(fr1Col).
@@ -188,6 +201,17 @@ self.body(func(inputs) {
 			annotations: { "pl7.app/label": "CDR3 Length" }
 		}
 	})
+	if !is_undefined(fullLengthCol) && fullLengthCol != "" {
+		propImportCols = append(propImportCols, {
+			column: "full_length",
+			spec: {
+				name: "pl7.app/vdj/sequenceLength",
+				valueType: "Long",
+				domain: { "pl7.app/vdj/feature": "FullLength" },
+				annotations: { "pl7.app/label": "Full Length" }
+			}
+		})
+	}
 	for lengthColumn in [
 		{ source: cdr1Col, column: "cdr1_length", label: "CDR1 Length", feature: "CDR1" },
 		{ source: cdr2Col, column: "cdr2_length", label: "CDR2 Length", feature: "CDR2" },

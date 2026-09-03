@@ -28,6 +28,7 @@ wf.body(func(args) {
 		blockId: blockId,
 		seqCol: args.seqCol,
 		countCol: args.countCol,
+		fullLengthCol: args.fullLengthCol,
 		cdr1Col: args.cdr1Col,
 		cdr2Col: args.cdr2Col,
 		fr1Col: args.fr1Col,
