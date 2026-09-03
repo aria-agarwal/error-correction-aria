@@ -93,6 +93,12 @@ if __name__ == "__main__":
     parser.add_argument("--output_keys_tsv", required=False, default=None)
     parser.add_argument("--seq_col", default="aaSeqCDR3")
     parser.add_argument("--count_col", default="readCount")
+    parser.add_argument("--cdr1_col", default=None)
+    parser.add_argument("--cdr2_col", default=None)
+    parser.add_argument("--fr1_col", default=None)
+    parser.add_argument("--fr2_col", default=None)
+    parser.add_argument("--fr3_col", default=None)
+    parser.add_argument("--fr4_col", default=None)
     parser.add_argument("--max_hd", type=int, default=2)
     parser.add_argument("--min_ratio", type=float, default=100)
     parser.add_argument("--lower_cutoff", type=float, default=5)
@@ -121,9 +127,27 @@ if __name__ == "__main__":
         flush=True,
     )
 
-    filtered_clones.to_csv(args.output_tsv, sep="\t", index=False)
+    length_columns = {"cdr3_length": args.seq_col}
+    for length_column, source_column in {
+        "cdr1_length": args.cdr1_col,
+        "cdr2_length": args.cdr2_col,
+        "framework1_length": args.fr1_col,
+        "framework2_length": args.fr2_col,
+        "framework3_length": args.fr3_col,
+        "framework4_length": args.fr4_col,
+    }.items():
+        if source_column:
+            length_columns[length_column] = source_column
+
+    output = filtered_clones[["clonotypeKey"]].copy()
+    for length_column, source_column in length_columns.items():
+        if source_column not in filtered_clones.columns:
+            raise ValueError(f"Input TSV is missing configured sequence column: {source_column}")
+        output[length_column] = filtered_clones[source_column].fillna("").astype(str).str.len()
+
+    output.to_csv(args.output_tsv, sep="\t", index=False)
     if args.output_keys_tsv:
-        filtered_clones[["clonotypeKey"]].drop_duplicates().to_csv(
+        output[["clonotypeKey"]].drop_duplicates().to_csv(
             args.output_keys_tsv,
             sep="\t",
             index=False,

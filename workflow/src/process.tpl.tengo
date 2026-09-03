@@ -17,6 +17,12 @@ self.body(func(inputs) {
 	columns := inputs.columns
 	seqCol := inputs.seqCol
 	countCol := inputs.countCol
+	cdr1Col := inputs.cdr1Col
+	cdr2Col := inputs.cdr2Col
+	fr1Col := inputs.fr1Col
+	fr2Col := inputs.fr2Col
+	fr3Col := inputs.fr3Col
+	fr4Col := inputs.fr4Col
 	maxHd := inputs.maxHd
 	minRatio := inputs.minRatio
 	lowerCutoff := inputs.lowerCutoff
@@ -83,6 +89,21 @@ self.body(func(inputs) {
 	ll.assert(matchedSeqCol != undefined, "Cannot resolve sequence column '" + seqCol + "'. Available VDJ sequence labels: " + string(availableSeqLabels))
 	slimBuilder.add(matchedSeqCol, { header: seqCol })
 
+	for _, optionalColName in [cdr1Col, cdr2Col, fr1Col, fr2Col, fr3Col, fr4Col] {
+		if is_undefined(optionalColName) || optionalColName == "" { continue }
+		matchedOptionalCol := undefined
+		for _, col in propertyCols {
+			label := col.spec.annotations["pl7.app/label"]
+			if is_undefined(label) { label = col.spec.name }
+			if label == optionalColName || col.spec.name == optionalColName {
+				matchedOptionalCol = col
+				break
+			}
+		}
+		ll.assert(matchedOptionalCol != undefined, "Cannot resolve optional sequence column '" + optionalColName + "'")
+		slimBuilder.add(matchedOptionalCol, { header: optionalColName })
+	}
+
 	abundanceBuilder := pframes.tsvFileBuilder()
 	abundanceBuilder.setAxisHeader(sampleIdAxisSpec, "sampleId")
 	abundanceBuilder.setAxisHeader(clonotypeKeyAxisSpec, "clonotypeKey")
@@ -103,10 +124,17 @@ self.body(func(inputs) {
 		arg("--output_keys_tsv").arg("surviving_keys.tsv").
 		arg("--seq_col").arg(seqCol).
 		arg("--count_col").arg(countCol).
+		arg("--cdr1_col").arg(cdr1Col).
+		arg("--cdr2_col").arg(cdr2Col).
+		arg("--fr1_col").arg(fr1Col).
+		arg("--fr2_col").arg(fr2Col).
+		arg("--fr3_col").arg(fr3Col).
+		arg("--fr4_col").arg(fr4Col).
 		arg("--max_hd").arg(string(maxHd)).
 		arg("--min_ratio").arg(string(minRatio)).
 		arg("--lower_cutoff").arg(string(lowerCutoff)).
 		addFile("input.tsv", slimBuilder.build()).
+		saveFile("output.tsv").
 		saveFile("surviving_keys.tsv").
 		printErrStreamToStdout().
 		saveStdoutContent().
@@ -116,9 +144,10 @@ self.body(func(inputs) {
 	abundanceDf := ptWf.frame(abundanceBuilder.build(), {xsvType: "tsv"})
 	propsDf := ptWf.frame(propsBuilder.build(), {xsvType: "tsv"})
 	keysDf := ptWf.frame(pythonResult.getFile("surviving_keys.tsv"), {xsvType: "tsv"})
+	lengthsDf := ptWf.frame(pythonResult.getFile("output.tsv"), {xsvType: "tsv"})
 
 	filteredAbundance := abundanceDf.join(keysDf, {on: "clonotypeKey", how: "inner"})
-	filteredProps := propsDf.join(keysDf, {on: "clonotypeKey", how: "inner"})
+	filteredProps := propsDf.join(keysDf, {on: "clonotypeKey", how: "inner"}).join(lengthsDf, {on: "clonotypeKey", how: "inner"})
 	filteredAbundance.save("filtered_abundance.tsv")
 	filteredProps.save("filtered_props.tsv")
 
@@ -148,6 +177,32 @@ self.body(func(inputs) {
 		propImportCols = append(propImportCols, {
 			column: "prop_" + string(i),
 			spec: newSpec
+		})
+	}
+	propImportCols = append(propImportCols, {
+		column: "cdr3_length",
+		spec: {
+			name: "pl7.app/vdj/sequenceLength",
+			valueType: "Long",
+			annotations: { "pl7.app/label": "CDR3 Length" }
+		}
+	})
+	for lengthColumn in [
+		{ source: cdr1Col, column: "cdr1_length", label: "CDR1 Length" },
+		{ source: cdr2Col, column: "cdr2_length", label: "CDR2 Length" },
+		{ source: fr1Col, column: "framework1_length", label: "Framework 1 Length" },
+		{ source: fr2Col, column: "framework2_length", label: "Framework 2 Length" },
+		{ source: fr3Col, column: "framework3_length", label: "Framework 3 Length" },
+		{ source: fr4Col, column: "framework4_length", label: "Framework 4 Length" }
+	] {
+		if is_undefined(lengthColumn.source) || lengthColumn.source == "" { continue }
+		propImportCols = append(propImportCols, {
+			column: lengthColumn.column,
+			spec: {
+				name: "pl7.app/vdj/sequenceLength",
+				valueType: "Long",
+				annotations: { "pl7.app/label": lengthColumn.label }
+			}
 		})
 	}
 
