@@ -12,11 +12,10 @@ const app = useApp();
       label="VDJ dataset"
       :options="app.model.outputs.inputOptions"
     />
-    <PlTextField v-model="app.model.data.seqCol" label="Sequence column" />
+    <PlTextField v-model="app.model.data.seqCol" label="CDR3 column" />
     <PlTextField v-model="app.model.data.countCol" label="Count column" />
     <PlTextField v-model="app.model.data.cdr1Col" label="CDR1 column (optional)" />
     <PlTextField v-model="app.model.data.cdr2Col" label="CDR2 column (optional)" />
-    <PlTextField v-model="app.model.data.cdr3Col" label="CDR3 column (optional)" />
     <PlTextField v-model="app.model.data.fr1Col" label="Framework 1 column (optional)" />
     <PlTextField v-model="app.model.data.fr2Col" label="Framework 2 column (optional)" />
     <PlTextField v-model="app.model.data.fr3Col" label="Framework 3 column (optional)" />

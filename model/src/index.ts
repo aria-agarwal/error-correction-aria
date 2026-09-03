@@ -7,7 +7,6 @@ export type BlockData = {
   countCol: string;
   cdr1Col: string;
   cdr2Col: string;
-  cdr3Col: string;
   fr1Col: string;
   fr2Col: string;
   fr3Col: string;
@@ -22,7 +21,6 @@ const dataModel = new DataModelBuilder().from<BlockData>("v1").init(() => ({
   countCol: "readCount",
   cdr1Col: "",
   cdr2Col: "",
-  cdr3Col: "",
   fr1Col: "",
   fr2Col: "",
   fr3Col: "",
@@ -40,7 +38,6 @@ export const platforma = BlockModelV3.create(dataModel)
     countCol: data.countCol,
     cdr1Col: data.cdr1Col,
     cdr2Col: data.cdr2Col,
-    cdr3Col: data.cdr3Col,
     fr1Col: data.fr1Col,
     fr2Col: data.fr2Col,
     fr3Col: data.fr3Col,
