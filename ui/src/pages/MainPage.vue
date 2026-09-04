@@ -23,6 +23,24 @@ const app = useApp();
     />
     <PlTextField v-model="app.model.data.seqCol" label="CDR3 column" />
     <PlTextField v-model="app.model.data.countCol" label="Count column" />
+    <PlNumberField
+      v-model="app.model.data.maxHd"
+      label="Max Hamming distance"
+      :min-value="1"
+      :step="1"
+    />
+    <PlNumberField
+      v-model="app.model.data.minRatio"
+      label="Min abundance ratio"
+      :min-value="1"
+      :step="1"
+    />
+    <PlNumberField
+      v-model="app.model.data.lowerCutoff"
+      label="Lower count cutoff"
+      :min-value="0"
+      :step="1"
+    />
     <PlSectionSeparator>Optional columns</PlSectionSeparator>
     <PlAccordion>
       <PlAccordionSection label="Sequence segments">
@@ -65,24 +83,6 @@ const app = useApp();
         :step="1"
       />
     </template>
-    <PlNumberField
-      v-model="app.model.data.maxHd"
-      label="Max Hamming distance"
-      :min-value="1"
-      :step="1"
-    />
-    <PlNumberField
-      v-model="app.model.data.minRatio"
-      label="Min abundance ratio"
-      :min-value="1"
-      :step="1"
-    />
-    <PlNumberField
-      v-model="app.model.data.lowerCutoff"
-      label="Lower count cutoff"
-      :min-value="0"
-      :step="1"
-    />
     <pre v-if="app.model.outputs.pythonMessage">{{ app.model.outputs.pythonMessage }}</pre>
   </PlBlockPage>
 </template>
