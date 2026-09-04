@@ -5,12 +5,17 @@ export type BlockData = {
   inputRef?: PlRef;
   seqCol: string;
   countCol: string;
+  fullLengthCol: string;
   cdr1Col: string;
   cdr2Col: string;
   fr1Col: string;
   fr2Col: string;
   fr3Col: string;
   fr4Col: string;
+  cdr3MinLength: number;
+  cdr3MaxLength: number;
+  fullLengthMinLength: number;
+  fullLengthMaxLength: number;
   maxHd: number;
   minRatio: number;
   lowerCutoff: number;
@@ -19,12 +24,17 @@ export type BlockData = {
 const dataModel = new DataModelBuilder().from<BlockData>("v1").init(() => ({
   seqCol: "aaSeqCDR3",
   countCol: "readCount",
+  fullLengthCol: "",
   cdr1Col: "",
   cdr2Col: "",
   fr1Col: "",
   fr2Col: "",
   fr3Col: "",
   fr4Col: "",
+  cdr3MinLength: 0,
+  cdr3MaxLength: 10000,
+  fullLengthMinLength: 0,
+  fullLengthMaxLength: 10000,
   maxHd: 2,
   minRatio: 100,
   lowerCutoff: 5,
@@ -36,12 +46,17 @@ export const platforma = BlockModelV3.create(dataModel)
     inputRef: data.inputRef,
     seqCol: data.seqCol,
     countCol: data.countCol,
+    fullLengthCol: data.fullLengthCol,
     cdr1Col: data.cdr1Col,
     cdr2Col: data.cdr2Col,
     fr1Col: data.fr1Col,
     fr2Col: data.fr2Col,
     fr3Col: data.fr3Col,
     fr4Col: data.fr4Col,
+    cdr3MinLength: data.cdr3MinLength,
+    cdr3MaxLength: data.cdr3MaxLength,
+    fullLengthMinLength: data.fullLengthMinLength,
+    fullLengthMaxLength: data.fullLengthMaxLength,
     maxHd: data.maxHd,
     minRatio: data.minRatio,
     lowerCutoff: data.lowerCutoff,

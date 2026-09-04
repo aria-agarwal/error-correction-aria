@@ -15,6 +15,30 @@ const app = useApp();
     <PlTextField v-model="app.model.data.seqCol" label="CDR3 column" />
     <PlTextField v-model="app.model.data.countCol" label="Count column" />
     <PlTextField v-model="app.model.data.fullLengthCol" label="Full-length column (optional)" />
+    <PlNumberField
+      v-model="app.model.data.cdr3MinLength"
+      label="CDR3 length greater than or equal to"
+      :min-value="0"
+      :step="1"
+    />
+    <PlNumberField
+      v-model="app.model.data.cdr3MaxLength"
+      label="CDR3 length less than or equal to"
+      :min-value="0"
+      :step="1"
+    />
+    <PlNumberField
+      v-model="app.model.data.fullLengthMinLength"
+      label="Full-length length greater than or equal to"
+      :min-value="0"
+      :step="1"
+    />
+    <PlNumberField
+      v-model="app.model.data.fullLengthMaxLength"
+      label="Full-length length less than or equal to"
+      :min-value="0"
+      :step="1"
+    />
     <PlTextField v-model="app.model.data.cdr1Col" label="CDR1 column (optional)" />
     <PlTextField v-model="app.model.data.cdr2Col" label="CDR2 column (optional)" />
     <PlTextField v-model="app.model.data.fr1Col" label="Framework 1 column (optional)" />

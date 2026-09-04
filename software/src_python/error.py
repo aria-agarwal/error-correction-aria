@@ -93,6 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_keys_tsv", required=False, default=None)
     parser.add_argument("--seq_col", default="aaSeqCDR3")
     parser.add_argument("--count_col", default="readCount")
+    parser.add_argument("--full_length_col", default=None)
     parser.add_argument("--cdr1_col", default=None)
     parser.add_argument("--cdr2_col", default=None)
     parser.add_argument("--fr1_col", default=None)
@@ -128,6 +129,8 @@ if __name__ == "__main__":
     )
 
     length_columns = {"cdr3_length": args.seq_col}
+    if args.full_length_col:
+        length_columns["full_length"] = args.full_length_col
     for length_column, source_column in {
         "cdr1_length": args.cdr1_col,
         "cdr2_length": args.cdr2_col,
