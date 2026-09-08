@@ -97,6 +97,24 @@ if __name__ == "__main__":
     parser.add_argument("--cdr3_min_length", type=int, default=0)
     parser.add_argument("--cdr3_max_length", type=int, default=10000)
     parser.add_argument("--filter_cdr3_length", action="store_true")
+    parser.add_argument("--cdr1_min_length", type=int, default=0)
+    parser.add_argument("--cdr1_max_length", type=int, default=10000)
+    parser.add_argument("--filter_cdr1_length", action="store_true")
+    parser.add_argument("--cdr2_min_length", type=int, default=0)
+    parser.add_argument("--cdr2_max_length", type=int, default=10000)
+    parser.add_argument("--filter_cdr2_length", action="store_true")
+    parser.add_argument("--fr1_min_length", type=int, default=0)
+    parser.add_argument("--fr1_max_length", type=int, default=10000)
+    parser.add_argument("--filter_fr1_length", action="store_true")
+    parser.add_argument("--fr2_min_length", type=int, default=0)
+    parser.add_argument("--fr2_max_length", type=int, default=10000)
+    parser.add_argument("--filter_fr2_length", action="store_true")
+    parser.add_argument("--fr3_min_length", type=int, default=0)
+    parser.add_argument("--fr3_max_length", type=int, default=10000)
+    parser.add_argument("--filter_fr3_length", action="store_true")
+    parser.add_argument("--fr4_min_length", type=int, default=0)
+    parser.add_argument("--fr4_max_length", type=int, default=10000)
+    parser.add_argument("--filter_fr4_length", action="store_true")
     parser.add_argument("--full_length_min_length", type=int, default=0)
     parser.add_argument("--full_length_max_length", type=int, default=10000)
     parser.add_argument("--filter_full_length", action="store_true")
@@ -133,6 +151,18 @@ if __name__ == "__main__":
         length_filters.append(("CDR3", args.seq_col, args.cdr3_min_length, args.cdr3_max_length))
     if args.filter_full_length and args.full_length_col:
         length_filters.append(("full length", args.full_length_col, args.full_length_min_length, args.full_length_max_length))
+    if args.filter_cdr1_length:
+        length_filters.append(("CDR1", args.cdr1_col, args.cdr1_min_length, args.cdr1_max_length))
+    if args.filter_cdr2_length:
+        length_filters.append(("CDR2", args.cdr2_col, args.cdr2_min_length, args.cdr2_max_length))
+    if args.filter_fr1_length:
+        length_filters.append(("Framework 1", args.fr1_col, args.fr1_min_length, args.fr1_max_length))
+    if args.filter_fr2_length:
+        length_filters.append(("Framework 2", args.fr2_col, args.fr2_min_length, args.fr2_max_length))
+    if args.filter_fr3_length:
+        length_filters.append(("Framework 3", args.fr3_col, args.fr3_min_length, args.fr3_max_length))
+    if args.filter_fr4_length:
+        length_filters.append(("Framework 4", args.fr4_col, args.fr4_min_length, args.fr4_max_length))
 
     for filter_name, column_name, minimum, maximum in length_filters:
         if minimum > maximum:

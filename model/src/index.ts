@@ -30,12 +30,12 @@ export type BlockData = {
   fr4MinLength: number;
   fr4MaxLength: number;
   filterFullLength: boolean;
-  filtercdr1: boolean;
-  filtercdr2: boolean;
-  filterfr1: boolean;
-  filterfr2: boolean;
-  filterfr3: boolean;
-  filterfr4: boolean;
+  filterCdr1Length: boolean;
+  filterCdr2Length: boolean;
+  filterFr1Length: boolean;
+  filterFr2Length: boolean;
+  filterFr3Length: boolean;
+  filterFr4Length: boolean;
   maxHd: number;
   minRatio: number;
   lowerCutoff: number;
@@ -69,6 +69,12 @@ const dataModel = new DataModelBuilder().from<BlockData>("v1").init(() => ({
   fr4MinLength: 0,
   fr4MaxLength: 10000,
   filterFullLength: false,
+  filterCdr1Length: false,
+  filterCdr2Length: false,
+  filterFr1Length: false,
+  filterFr2Length: false,
+  filterFr3Length: false,
+  filterFr4Length: false,
   filtercdr1: false,
   filtercdr2: false,
   filterfr1: false,
@@ -95,8 +101,10 @@ export const platforma = BlockModelV3.create(dataModel)
     fr4Col: data.fr4Col,
     cdr3MinLength: data.cdr3MinLength,
     cdr3MaxLength: data.cdr3MaxLength,
+    filterCdr3Length: data.filterCdr3Length,
     fullLengthMinLength: data.fullLengthMinLength,
     fullLengthMaxLength: data.fullLengthMaxLength,
+    filterFullLength: data.filterFullLength,
     cdr1MinLength: data.cdr1MinLength,
     cdr1MaxLength: data.cdr1MaxLength,
     cdr2MinLength: data.cdr2MinLength,
