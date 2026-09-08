@@ -186,6 +186,18 @@ self.body(func(inputs) {
 		arg("--full_length_col").arg(fullLengthCol).
 		arg("--cdr3_min_length").arg(string(cdr3MinLength)).
 		arg("--cdr3_max_length").arg(string(cdr3MaxLength)).
+		arg("--cdr1_min_length").arg(string(cdr1MinLength)).
+		arg("--cdr1_max_length").arg(string(cdr1MaxLength)).
+		arg("--cdr2_min_length").arg(string(cdr2MinLength)).
+		arg("--cdr2_max_length").arg(string(cdr2MaxLength)).
+		arg("--fr1_min_length").arg(string(fr1MinLength)).
+		arg("--fr1_max_length").arg(string(fr1MaxLength)).
+		arg("--fr2_min_length").arg(string(fr2MinLength)).
+		arg("--fr2_max_length").arg(string(fr2MaxLength)).
+		arg("--fr3_min_length").arg(string(fr3MinLength)).
+		arg("--fr3_max_length").arg(string(fr3MaxLength)).
+		arg("--fr4_min_length").arg(string(fr4MinLength)).
+		arg("--fr4_max_length").arg(string(fr4MaxLength)).
 		arg("--full_length_min_length").arg(string(fullLengthMinLength)).
 		arg("--full_length_max_length").arg(string(fullLengthMaxLength)).
 		arg("--cdr1_col").arg(cdr1Col).
@@ -204,6 +216,12 @@ self.body(func(inputs) {
 		saveStdoutContent()
 	if filterCdr3Length { pythonCommand = pythonCommand.arg("--filter_cdr3_length") }
 	if filterFullLength { pythonCommand = pythonCommand.arg("--filter_full_length") }
+	if filterCdr1Length { pythonCommand = pythonCommand.arg("--filter_cdr1_length") }
+	if filterCdr2Length { pythonCommand = pythonCommand.arg("--filter_cdr2_length") }
+	if filterFr1Length { pythonCommand = pythonCommand.arg("--filter_fr1_length") }
+	if filterFr2Length { pythonCommand = pythonCommand.arg("--filter_fr2_length") }
+	if filterFr3Length { pythonCommand = pythonCommand.arg("--filter_fr3_length") }
+	if filterFr4Length { pythonCommand = pythonCommand.arg("--filter_fr4_length") }
 	pythonResult := pythonCommand.run()
 
 	ptWf := pt.workflow()
