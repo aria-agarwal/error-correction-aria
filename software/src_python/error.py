@@ -94,6 +94,12 @@ if __name__ == "__main__":
     parser.add_argument("--seq_col", default="aaSeqCDR3")
     parser.add_argument("--count_col", default="readCount")
     parser.add_argument("--full_length_col", default=None)
+    parser.add_argument("--cdr3_min_length", type=int, default=0)
+    parser.add_argument("--cdr3_max_length", type=int, default=10000)
+    parser.add_argument("--filter_cdr3_length", action="store_true")
+    parser.add_argument("--full_length_min_length", type=int, default=0)
+    parser.add_argument("--full_length_max_length", type=int, default=10000)
+    parser.add_argument("--filter_full_length", action="store_true")
     parser.add_argument("--cdr1_col", default=None)
     parser.add_argument("--cdr2_col", default=None)
     parser.add_argument("--fr1_col", default=None)
@@ -121,6 +127,22 @@ if __name__ == "__main__":
     log10_seq_filtered_count = log10_seq_filtered_count[log10_seq_filtered_count[args.count_col]>np.log10(args.lower_cutoff)].copy()
     filtered_clones = clones[clones[args.seq_col].isin(log10_seq_filtered_count[args.seq_col])].drop_duplicates(args.seq_col)
 
+
+    length_filters = []
+    if args.filter_cdr3_length:
+        length_filters.append(("CDR3", args.seq_col, args.cdr3_min_length, args.cdr3_max_length))
+    if args.filter_full_length and args.full_length_col:
+        length_filters.append(("full length", args.full_length_col, args.full_length_min_length, args.full_length_max_length))
+
+    for filter_name, column_name, minimum, maximum in length_filters:
+        if minimum > maximum:
+            raise ValueError(f"{filter_name} minimum length cannot exceed its maximum length")
+        if column_name not in filtered_clones.columns:
+            raise ValueError(f"Input TSV is missing configured sequence column: {column_name}")
+        lengths = filtered_clones[column_name].fillna("").astype(str).str.len()
+        filtered_clones = filtered_clones[lengths.between(minimum, maximum)]
+
+        
     print(
         f"Input rows: {len(clones)}; unique sequences: {len(seq_raw_count)}; "
         f"error-corrected children: {len(compare)}; survivors above cutoff: {len(filtered_clones)}",

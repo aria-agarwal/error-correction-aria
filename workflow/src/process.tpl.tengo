@@ -18,6 +18,12 @@ self.body(func(inputs) {
 	seqCol := inputs.seqCol
 	countCol := inputs.countCol
 	fullLengthCol := inputs.fullLengthCol
+	cdr3MinLength := inputs.cdr3MinLength
+	cdr3MaxLength := inputs.cdr3MaxLength
+	filterCdr3Length := inputs.filterCdr3Length
+	fullLengthMinLength := inputs.fullLengthMinLength
+	fullLengthMaxLength := inputs.fullLengthMaxLength
+	filterFullLength := inputs.filterFullLength
 	cdr1Col := inputs.cdr1Col
 	cdr2Col := inputs.cdr2Col
 	fr1Col := inputs.fr1Col
@@ -129,7 +135,7 @@ self.body(func(inputs) {
 		propsBuilder.add(col, { header: "prop_" + string(i) })
 	}
 
-	pythonResult := exec.builder().
+	pythonCommand := exec.builder().
 		software(errorCorrectionSw).
 		arg("--input_tsv").arg("input.tsv").
 		arg("--output_tsv").arg("output.tsv").
@@ -137,6 +143,10 @@ self.body(func(inputs) {
 		arg("--seq_col").arg(seqCol).
 		arg("--count_col").arg(countCol).
 		arg("--full_length_col").arg(fullLengthCol).
+		arg("--cdr3_min_length").arg(string(cdr3MinLength)).
+		arg("--cdr3_max_length").arg(string(cdr3MaxLength)).
+		arg("--full_length_min_length").arg(string(fullLengthMinLength)).
+		arg("--full_length_max_length").arg(string(fullLengthMaxLength)).
 		arg("--cdr1_col").arg(cdr1Col).
 		arg("--cdr2_col").arg(cdr2Col).
 		arg("--fr1_col").arg(fr1Col).
@@ -150,8 +160,10 @@ self.body(func(inputs) {
 		saveFile("output.tsv").
 		saveFile("surviving_keys.tsv").
 		printErrStreamToStdout().
-		saveStdoutContent().
-		run()
+		saveStdoutContent()
+	if filterCdr3Length { pythonCommand = pythonCommand.arg("--filter_cdr3_length") }
+	if filterFullLength { pythonCommand = pythonCommand.arg("--filter_full_length") }
+	pythonResult := pythonCommand.run()
 
 	ptWf := pt.workflow()
 	abundanceDf := ptWf.frame(abundanceBuilder.build(), {xsvType: "tsv"})
