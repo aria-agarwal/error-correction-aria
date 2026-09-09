@@ -149,6 +149,40 @@ export const platforma = BlockModelV3.create(dataModel)
 
   .output("isRunning", (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
+  // Sequence-type property columns of the selected dataset (CDR3, CDR1/2, FR1-4, full length, etc.).
+  .output("sequenceColumnOptions", (ctx) => {
+    const inputRef = ctx.args?.inputRef;
+    if (inputRef === undefined) return [];
+    const columns = ctx.resultPool.getAnchoredPColumns(
+      { main: inputRef },
+      { axes: [{ anchor: "main", idx: 1 }], name: "pl7.app/vdj/sequence" },
+    );
+    return (columns ?? []).map((col) => {
+      const label = col.spec.annotations?.["pl7.app/label"] ?? col.spec.name;
+      return { value: label, label };
+    });
+  })
+
+  // Non-normalized abundance columns of the selected dataset (e.g. read count, UMI count).
+  .output("countColumnOptions", (ctx) => {
+    const inputRef = ctx.args?.inputRef;
+    if (inputRef === undefined) return [];
+    const columns = ctx.resultPool.getAnchoredPColumns(
+      { main: inputRef },
+      {
+        axes: [
+          { anchor: "main", idx: 0 },
+          { anchor: "main", idx: 1 },
+        ],
+        annotations: { "pl7.app/isAbundance": "true", "pl7.app/abundance/normalized": "false" },
+      },
+    );
+    return (columns ?? []).map((col) => {
+      const label = col.spec.annotations?.["pl7.app/label"] ?? col.spec.name;
+      return { value: label, label };
+    });
+  })
+
   .output("pythonMessage", (ctx) => ctx.outputs?.resolve("pythonMessage")?.getDataAsString())
 
   // The workflow exports a pframe as `pf`; use its presence as completion signal.
