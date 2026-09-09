@@ -1,30 +1,28 @@
 <script setup lang="ts">
-
+import { ref } from "vue";
 import {
   PlAccordion,
   PlAccordionSection,
-  PlAlert,
   PlBlockPage,
   PlBtnGhost,
-  PlDropdown,
-  PlDropdownMulti,
   PlDropdownRef,
-  PlLogView,
-  PlMaskIcon24,
   PlNumberField,
   PlSectionSeparator,
   PlSlideModal,
-  PlTabs,
   PlTextField,
 } from "@platforma-sdk/ui-vue";
 import { PlToggleSwitch } from "@milaboratories/uikit";
 import { useApp } from "../app";
 
 const app = useApp();
+const filtersOpen = ref(false);
 </script>
 
 <template>
   <PlBlockPage title="Custom Error Correction">
+    <template #append>
+      <PlBtnGhost @click.stop="() => (filtersOpen = true)">Length filters</PlBtnGhost>
+    </template>
     <PlDropdownRef
       v-model="app.model.data.inputRef"
       label="VDJ dataset"
@@ -62,126 +60,142 @@ const app = useApp();
         <PlTextField v-model="app.model.data.fr4Col" label="Framework 4 column" />
       </PlAccordionSection>
     </PlAccordion>
-    <PlToggleSwitch v-model="app.model.data.filterCdr3Length" label="Filter by CDR3 length" />
-    <template v-if="app.model.data.filterCdr3Length">
-      <PlNumberField
-        v-model="app.model.data.cdr3MinLength"
-        label="CDR3 length greater than or equal to"
-        :min-value="0"
-        :step="1"
+
+    <PlSlideModal v-model="filtersOpen" title="Length filters" :close-on-outside-click="true">
+      <PlToggleSwitch v-model="app.model.data.filterCdr3Length" label="Filter by CDR3 length" />
+      <template v-if="app.model.data.filterCdr3Length">
+        <PlNumberField
+          v-model="app.model.data.cdr3MinLength"
+          label="CDR3 length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.cdr3MaxLength"
+          label="CDR3 length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+      <PlToggleSwitch v-model="app.model.data.filterFullLength" label="Filter by full length" />
+      <template v-if="app.model.data.filterFullLength">
+        <PlNumberField
+          v-model="app.model.data.fullLengthMinLength"
+          label="Full-length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.fullLengthMaxLength"
+          label="Full-length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+      <PlToggleSwitch v-model="app.model.data.filterCdr1Length" label="Filter by CDR1 length" />
+      <template v-if="app.model.data.filterCdr1Length">
+        <PlNumberField
+          v-model="app.model.data.cdr1MinLength"
+          label="CDR1 length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.cdr1MaxLength"
+          label="CDR1 length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+      <PlToggleSwitch v-model="app.model.data.filterCdr2Length" label="Filter by CDR2 length" />
+      <template v-if="app.model.data.filterCdr2Length">
+        <PlNumberField
+          v-model="app.model.data.cdr2MinLength"
+          label="CDR2 length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.cdr2MaxLength"
+          label="CDR2 length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+      <PlToggleSwitch
+        v-model="app.model.data.filterFr1Length"
+        label="Filter by Framework 1 length"
       />
-      <PlNumberField
-        v-model="app.model.data.cdr3MaxLength"
-        label="CDR3 length less than or equal to"
-        :min-value="0"
-        :step="1"
+      <template v-if="app.model.data.filterFr1Length">
+        <PlNumberField
+          v-model="app.model.data.fr1MinLength"
+          label="FR1 length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.fr1MaxLength"
+          label="FR1 length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+      <PlToggleSwitch
+        v-model="app.model.data.filterFr2Length"
+        label="Filter by Framework 2 length"
       />
-    </template>
-    <PlToggleSwitch v-model="app.model.data.filterFullLength" label="Filter by full length" />
-    <template v-if="app.model.data.filterFullLength">
-      <PlNumberField
-        v-model="app.model.data.fullLengthMinLength"
-        label="Full-length greater than or equal to"
-        :min-value="0"
-        :step="1"
+      <template v-if="app.model.data.filterFr2Length">
+        <PlNumberField
+          v-model="app.model.data.fr2MinLength"
+          label="FR2 length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.fr2MaxLength"
+          label="FR2 length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+      <PlToggleSwitch
+        v-model="app.model.data.filterFr3Length"
+        label="Filter by Framework 3 length"
       />
-      <PlNumberField
-        v-model="app.model.data.fullLengthMaxLength"
-        label="Full-length less than or equal to"
-        :min-value="0"
-        :step="1"
+      <template v-if="app.model.data.filterFr3Length">
+        <PlNumberField
+          v-model="app.model.data.fr3MinLength"
+          label="FR3 length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.fr3MaxLength"
+          label="FR3 length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+      <PlToggleSwitch
+        v-model="app.model.data.filterFr4Length"
+        label="Filter by Framework 4 length"
       />
-    </template>
-    <PlToggleSwitch v-model="app.model.data.filterCdr1Length" label="Filter by CDR1 length" />
-    <template v-if="app.model.data.filterCdr1Length">
-      <PlNumberField
-        v-model="app.model.data.cdr1MinLength"
-        label="CDR1 length greater than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-      <PlNumberField
-        v-model="app.model.data.cdr1MaxLength"
-        label="CDR1 length less than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-    </template>
-    <PlToggleSwitch v-model="app.model.data.filterCdr2Length" label="Filter by CDR2 length" />
-    <template v-if="app.model.data.filterCdr2Length">
-      <PlNumberField
-        v-model="app.model.data.cdr2MinLength"
-        label="CDR2 length greater than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-      <PlNumberField
-        v-model="app.model.data.cdr2MaxLength"
-        label="CDR2 length less than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-    </template>
-    <PlToggleSwitch v-model="app.model.data.filterFr1Length" label="Filter by Framework 1 length" />
-    <template v-if="app.model.data.filterFr1Length">
-      <PlNumberField
-        v-model="app.model.data.fr1MinLength"
-        label="FR1 length greater than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-      <PlNumberField
-        v-model="app.model.data.fr1MaxLength"
-        label="FR1 length less than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-    </template>
-    <PlToggleSwitch v-model="app.model.data.filterFr2Length" label="Filter by Framework 2 length" />
-    <template v-if="app.model.data.filterFr2Length">
-      <PlNumberField
-        v-model="app.model.data.fr2MinLength"
-        label="FR2 length greater than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-      <PlNumberField
-        v-model="app.model.data.fr2MaxLength"
-        label="FR2 length less than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-    </template>
-    <PlToggleSwitch v-model="app.model.data.filterFr3Length" label="Filter by Framework 3 length" />
-    <template v-if="app.model.data.filterFr3Length">
-      <PlNumberField
-        v-model="app.model.data.fr3MinLength"
-        label="FR3 length greater than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-      <PlNumberField
-        v-model="app.model.data.fr3MaxLength"
-        label="FR3 length less than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-    </template>
-    <PlToggleSwitch v-model="app.model.data.filterFr4Length" label="Filter by Framework 4 length" />
-    <template v-if="app.model.data.filterFr4Length">
-      <PlNumberField
-        v-model="app.model.data.fr4MinLength"
-        label="FR4 length greater than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-      <PlNumberField
-        v-model="app.model.data.fr4MaxLength"
-        label="FR4 length less than or equal to"
-        :min-value="0"
-        :step="1"
-      />
-    </template>
+      <template v-if="app.model.data.filterFr4Length">
+        <PlNumberField
+          v-model="app.model.data.fr4MinLength"
+          label="FR4 length greater than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+        <PlNumberField
+          v-model="app.model.data.fr4MaxLength"
+          label="FR4 length less than or equal to"
+          :min-value="0"
+          :step="1"
+        />
+      </template>
+    </PlSlideModal>
+
     <pre v-if="app.model.outputs.pythonMessage">{{ app.model.outputs.pythonMessage }}</pre>
   </PlBlockPage>
 </template>
