@@ -5,11 +5,11 @@ import {
   PlAccordionSection,
   PlBlockPage,
   PlBtnGhost,
+  PlDropdown,
   PlDropdownRef,
   PlNumberField,
   PlSectionSeparator,
   PlSlideModal,
-  PlTextField,
 } from "@platforma-sdk/ui-vue";
 import { PlToggleSwitch } from "@milaboratories/uikit";
 import { useApp } from "../app";
@@ -29,8 +29,16 @@ const filtersOpen = ref(false);
       label="VDJ dataset"
       :options="app.model.outputs.inputOptions"
     />
-    <PlTextField v-model="app.model.data.seqCol" label="CDR3 column" />
-    <PlTextField v-model="app.model.data.countCol" label="Count column" />
+    <PlDropdown
+      v-model="app.model.data.seqCol"
+      label="CDR3 column"
+      :options="app.model.outputs.sequenceColumnOptions"
+    />
+    <PlDropdown
+      v-model="app.model.data.countCol"
+      label="Count column"
+      :options="app.model.outputs.countColumnOptions"
+    />
     <PlNumberField
       v-model="app.model.data.maxHd"
       label="Max Hamming distance"
@@ -52,13 +60,41 @@ const filtersOpen = ref(false);
     <PlSectionSeparator>Optional columns</PlSectionSeparator>
     <PlAccordion>
       <PlAccordionSection label="Sequence segments">
-        <PlTextField v-model="app.model.data.fullLengthCol" label="Full-length column" />
-        <PlTextField v-model="app.model.data.cdr1Col" label="CDR1 column" />
-        <PlTextField v-model="app.model.data.cdr2Col" label="CDR2 column" />
-        <PlTextField v-model="app.model.data.fr1Col" label="Framework 1 column" />
-        <PlTextField v-model="app.model.data.fr2Col" label="Framework 2 column" />
-        <PlTextField v-model="app.model.data.fr3Col" label="Framework 3 column" />
-        <PlTextField v-model="app.model.data.fr4Col" label="Framework 4 column" />
+        <PlDropdown
+          v-model="app.model.data.fullLengthCol"
+          label="Full-length column"
+          :options="app.model.outputs.sequenceColumnOptions"
+        />
+        <PlDropdown
+          v-model="app.model.data.cdr1Col"
+          label="CDR1 column"
+          :options="app.model.outputs.sequenceColumnOptions"
+        />
+        <PlDropdown
+          v-model="app.model.data.cdr2Col"
+          label="CDR2 column"
+          :options="app.model.outputs.sequenceColumnOptions"
+        />
+        <PlDropdown
+          v-model="app.model.data.fr1Col"
+          label="Framework 1 column"
+          :options="app.model.outputs.sequenceColumnOptions"
+        />
+        <PlDropdown
+          v-model="app.model.data.fr2Col"
+          label="Framework 2 column"
+          :options="app.model.outputs.sequenceColumnOptions"
+        />
+        <PlDropdown
+          v-model="app.model.data.fr3Col"
+          label="Framework 3 column"
+          :options="app.model.outputs.sequenceColumnOptions"
+        />
+        <PlDropdown
+          v-model="app.model.data.fr4Col"
+          label="Framework 4 column"
+          :options="app.model.outputs.sequenceColumnOptions"
+        />
       </PlAccordionSection>
     </PlAccordion>
 
