@@ -23,6 +23,7 @@ const filtersOpen = ref(false);
     <template #append>
       <PlBtnGhost @click.stop="() => (filtersOpen = true)">Length filters</PlBtnGhost>
     </template>
+    <PlSectionSeparator>Required columns</PlSectionSeparator>
     <PlDropdownRef
       v-model="app.model.data.inputRef"
       label="VDJ dataset"
