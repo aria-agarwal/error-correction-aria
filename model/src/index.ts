@@ -42,8 +42,8 @@ export type BlockData = {
 };
 
 const dataModel = new DataModelBuilder().from<BlockData>("v1").init(() => ({
-  seqCol: "aaSeqCDR3",
-  countCol: "readCount",
+  seqCol: "",
+  countCol: "",
   fullLengthCol: "",
   cdr1Col: "",
   cdr2Col: "",
